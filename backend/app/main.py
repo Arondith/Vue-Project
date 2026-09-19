@@ -16,6 +16,13 @@ from .schemas import (
 )
 
 
+def payload_to_model_data(payload: ApplicationCreate | ApplicationUpdate) -> dict[str, object]:
+    data = payload.model_dump()
+    if data.get("job_url") is not None:
+        data["job_url"] = str(data["job_url"])
+    return data
+
+
 @asynccontextmanager
 async def lifespan(_: FastAPI):
     Base.metadata.create_all(bind=engine)
@@ -77,8 +84,7 @@ def list_applications(
     status_code=status.HTTP_201_CREATED,
 )
 def create_application(payload: ApplicationCreate, db: Session = Depends(get_db)):
-    data = payload.model_dump(mode="json")
-    application = Application(**data)
+    application = Application(**payload_to_model_data(payload))
     db.add(application)
     db.commit()
     db.refresh(application)
@@ -95,7 +101,7 @@ def update_application(
     if application is None:
         raise HTTPException(status_code=404, detail="Application not found")
 
-    for key, value in payload.model_dump(mode="json").items():
+    for key, value in payload_to_model_data(payload).items():
         setattr(application, key, value)
 
     db.commit()
