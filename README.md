@@ -72,6 +72,23 @@ npm run dev
 
 Frontend: http://localhost:5173
 
+## Run tests
+
+The backend includes a Pytest configuration and API tests. After installing the backend dependencies, run the test suite from the `backend` directory:
+
+```bash
+cd backend
+pytest
+```
+
+For a more detailed test report:
+
+```bash
+pytest -v
+```
+
+Run the tests after backend/API changes to catch regressions before committing.
+
 ## Environment
 
 The frontend defaults to:
